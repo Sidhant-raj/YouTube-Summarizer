@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Common styles for all screen sizes */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f9f9f9;
+            overflow: auto;
+        }
+
+        .outer-div {
+            width: 80%; /* Adjusted width for responsiveness */
+            max-width: 800px; /* Set a maximum width */
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #3498db;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            color: #fff;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #2ecc71;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #responseOutput {
+            margin-top: 10px;
+            color: #fff;
+            text-align: justify;
+            overflow: auto;
+        }
+
+        #loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        /* Media query for screens smaller than 600px (typical mobile phones) */
+        @media only screen and (max-width: 600px) {
+            .outer-div {
+                width: 90%; /* Adjusted width for smaller screens */
+            }
+
+            #loading {
+                padding: 10px; /* Adjusted padding for smaller screens */
+            }
+        }
+    </style>
+    <title>YouTube Summarizer</title>
+</head>
+
+<body>
+    <div id="loading"><i class="fas fa-spinner fa-spin" style="color: #000000;"></i></div>
+
+    <div class="outer-div">
+        <form id="messageForm">
+            <label for="messageInput">Enter Message:</label>
+            <input type="text" id="messageInput" name="messageInput" required>
+            <button type="submit">Send Message</button>
+        </form>
+        <div id="responseOutput"></div>
+    </div>
+
+    <script>
+        document.getElementById('messageForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            document.getElementById('loading').style.display = 'block';
+
+            const serverAddress = 'http://192.168.116.228:8080';
+            const message = document.getElementById('messageInput').value;
+
+            fetch(serverAddress, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Server response:', data);
+
+                const responseOutput = document.getElementById('responseOutput');
+                responseOutput.innerHTML = 'Output Summary: ' + data.summary_text;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+
+                const responseOutput = document.getElementById('responseOutput');
+                responseOutput.innerHTML = 'Error: ' + error.message;
+            })
+            .finally(() => {
+                document.getElementById('loading').style.display = 'none';
+            });
+        });
+    </script>
+    <script src="https://kit.fontawesome.com/d674823cfa.js" crossorigin="anonymous"></script>
+</body>
+</html>
